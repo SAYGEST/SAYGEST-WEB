@@ -22,18 +22,21 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: saygest
-
-      - name: Build
-        run: npm run build
-        working-directory: saygest
+      - name: Install and Build
+        run: |
+          # Este comando busca dónde está el package.json y entra ahí
+          TARGET_DIR=$(find . -name "package.json" -not -path "*/node_modules/*" -exec dirname {} \;)
+          echo "Carpeta encontrada: $TARGET_DIR"
+          cd $TARGET_DIR
+          npm install
+          npm run build
+          # Movemos el resultado a una carpeta predecible
+          mv dist ../final_dist
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./saygest/dist
+          path: ./final_dist
 
   deploy:
     environment:
